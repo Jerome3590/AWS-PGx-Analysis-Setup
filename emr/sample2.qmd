@@ -1,0 +1,271 @@
+---
+title: "EMR_Tests"
+author: "Jerome Dixon"
+date: "2022-08-21"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(cache = TRUE, warning=FALSE, message=FALSE, eval = FALSE, echo = TRUE)
+
+```
+
+
+```{r install-arrow}
+
+Sys.setenv("ARROW_DEPENDENCY_SOURCE" = "BUNDLED")
+Sys.setenv("NOT_CRAN" = TRUE)
+
+source("https://raw.githubusercontent.com/apache/arrow/master/r/R/install-arrow.R")
+
+install_arrow(verbose = FALSE)
+
+```
+
+
+```{r}
+
+install.packages('nycflights13')
+
+```
+
+
+
+```{r Load-Libraries, results='hide'}
+
+library(readxl)
+library(sparklyr)
+library(flicker)
+library(dplyr)
+library(magrittr)
+library(DBI)
+library(ggplot2)
+library(dbplot)
+library(tidyverse)
+library(stringr)
+library(here)
+library(aws.s3)
+library(aws.signature)
+library(aws.ec2metadata)
+library(jsonlite)
+library(scales)
+library(kableExtra)
+library(reticulate)
+library(arrow)
+library(nycflights13)
+
+
+```
+
+
+```{r spark-session}
+
+# create the Spark context
+sc <- spark_connect(master = "yarn", version = "3.2.1")
+
+
+```
+
+
+```{r sample-data}
+
+# copy some builtin sample data to the Spark cluster
+iris_tbl <- copy_to(sc, iris, overwrite = TRUE)
+
+flights_tbl <- copy_to(sc, nycflights13::flights, "flights", overwrite = TRUE)
+
+batting_tbl <- copy_to(sc, Lahman::Batting, "batting", overwrite = TRUE)
+
+src_tbls(sc)
+
+```
+
+
+```{r}
+
+# filter by departure delay and print the first few records
+flights_tbl %>% filter(dep_delay == 2)
+
+```
+
+
+```{r plot-data}
+
+# plot data on flight delays
+delay <- flights_tbl %>% 
+  group_by(tailnum) %>%
+  summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+  filter(count > 20, dist < 2000, !is.na(delay)) %>%
+  collect
+
+ggplot(delay, aes(dist, delay)) +
+  geom_point(aes(size = count), alpha = 1/2) +
+  geom_smooth() +
+  scale_size_area(max_size = 2)
+
+
+```
+
+
+```{r window-functions}
+
+# window functions  
+batting_tbl %>%
+  select(playerID, yearID, teamID, G, AB:H) %>%
+  group_by(playerID) %>%
+  filter(min_rank(desc(H)) <= 2 & H > 0) %>%
+  arrange(playerID, yearID, teamID)
+
+```
+
+
+```{r}
+
+# use SQL  
+iris_preview <- dbGetQuery(sc, "SELECT * FROM iris LIMIT 10")
+iris_preview
+
+```
+
+
+```{r}
+
+"SELECT * FROM `iris` LIMIT 10" %>%
+  dbplyr::sql() %>%
+  tbl(sc, .)
+
+
+```
+
+
+### SQL Query with R Output Object
+
+```{sql, connection=sc, output.var = "query1", sql.show_interpolated = TRUE}
+
+SELECT * FROM `iris` LIMIT 10
+
+```
+
+
+
+# Machine learning example using Spark MLlib
+
+```{r}
+
+# copy the mtcars data into Spark
+mtcars_tbl <- copy_to(sc, mtcars)
+
+# transform our data set, and then partition into 'training', 'test'
+partitions <- mtcars_tbl %>%
+  filter(hp >= 100) %>%
+  mutate(cyl8 = cyl == 8) %>%
+  sdf_random_split(training = 0.5, test = 0.5, seed = 1099)
+
+# fit a linear regression model to the training dataset
+fit <- partitions$training %>%
+  ml_linear_regression(response = "mpg", features = c("wt", "cyl"))
+fit
+
+summary(fit)
+
+# get the 10th row in test data
+car <- tbl_df(partitions$test) %>% slice(10)
+# predict the mpg 
+predicted_mpg <- car$cyl * fit$coefficients["cyl"] + car$wt * fit$coefficients["wt"] + fit$coefficients["(Intercept)"]
+
+# print the original and the predicted
+sprintf("original mpg = %s, predicted mpg = %s", car$mpg, predicted_mpg)
+
+
+```
+
+
+```{r}
+
+# May need to call invoke with sparklyr: sparklyr::invoke
+# as.list() for strings*
+
+
+count_lines <- function(sc, file) {
+  spark_context(sc) %>% 
+    invoke("textFile", file, 1L) %>% 
+    invoke("count")
+}
+
+
+```
+
+
+```{r}
+
+# Get the count of rows
+flights_tbl %>%
+  spark_dataframe() %>%
+  sparklyr::invoke("count")
+
+
+```
+
+
+```{r invoke-describe}
+
+tbl_flights_summary <- flights_tbl %>%
+  spark_dataframe() %>%
+  sparklyr::invoke("describe", as.list(colnames(flights_tbl))) %>%
+  sdf_register()
+
+tbl_flights_summary
+
+```
+
+
+```{r}
+
+flight2 <- flights_tbl %>% 
+  sdf_register("flight2")
+
+
+```
+
+
+```{r write-to-parquet}
+
+spark_write_parquet(flight2, path = 's3://pgxdatalake/test/', mode = "overwrite", skipNul = TRUE, partitions = 372, partition_by = c('month','day','tailnum'))
+
+
+```
+
+
+
+```{r Render-Markdown, include=FALSE}
+
+# Large objects - Using this method to knit document
+rmarkdown::render("emr_tests.Rmd")
+
+
+```
+
+
+```{sh Copy-Rmarkdown, include=FALSE, eval=FALSE}
+
+cd /home/hadoop/code
+
+aws s3 cp /home/hadoop/emr_tests.html s3://plotly-demo/ 
+
+     
+```
+
+
+```{sh Update-EDA-Script, include=FALSE}
+
+cd /home/hadoop/code
+
+# Copies EDA to EMR Setup Bootstrap Script For Next EMR Cluster Build
+aws s3 cp /home/hadoop/code/emr_tests.Rmd s3://pgx-terraform/code/ 
+
+
+```
+
+

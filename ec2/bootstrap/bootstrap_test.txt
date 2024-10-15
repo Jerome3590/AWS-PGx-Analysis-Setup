@@ -1,0 +1,93 @@
+USER="pgx3874"
+TARGET_DIR="/home/pgx3874/Step9_Predictive_Model/"
+adduser $USER
+mkdir -p $TARGET_DIR
+chmod -R 777 $TARGET_DIR
+chown -R $USER:$USER $TARGET_DIR
+usermod -aG wheel $USER
+yum update -y
+amazon-linux-extras install -y epel
+yum install -y amazon-cloudwatch-agent
+chmod 777 /opt/aws/amazon-cloudwatch-agent/bin/
+cat <<EOF > /opt/aws/amazon-cloudwatch-agent/bin/config.json
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "run_as_user": "cwagent"
+    },
+    "metrics": {
+        "append_dimensions": {
+            "InstanceId": "${aws:InstanceId}",
+            "InstanceType": "${aws:InstanceType}"
+        },
+        "metrics_collected": {
+            "cpu": {
+                "measurement": [
+                    "cpu_usage_idle",
+                    "cpu_usage_iowait",
+                    "cpu_usage_user",
+                    "cpu_usage_system",
+                    "cpu_usage_steal",
+                    "cpu_usage_nice",
+                    "cpu_usage_guest",
+                    "cpu_usage_guest_nice",
+                    "cpu_usage_irq",
+                    "cpu_usage_softirq"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": true
+            },
+            "disk": {
+                "measurement": [
+                    "used_percent",
+                    "inodes_free"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "/"
+                ]
+            },
+            "diskio": {
+                "measurement": [
+                    "io_time",
+                    "write_bytes",
+                    "read_bytes",
+                    "writes",
+                    "reads"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "/"
+                ]
+            },
+            "mem": {
+                "measurement": [
+                    "mem_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "swap": {
+                "measurement": [
+                    "swap_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    }
+}
+EOF
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+id cwagent || useradd cwagent
+INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+SENDER="jerome.dixon@mushinsolutions.awsapps.com"
+RECIPIENT="dixonrj@vcu.edu"
+SUBJECT="Bootstrap Completed on EC2 Instance: $INSTANCE_ID"
+AWS_REGION="us-east-1"
+BODY_TEXT="RStudio Server is successfully running on instance: $INSTANCE_ID."
+if systemctl is-active --quiet rstudio-server
+then aws ses send-email \
+        --from "$SENDER" \
+        --destination "ToAddresses=$RECIPIENT" \
+        --message "Subject={Data=$SUBJECT},Body={Text={Data=$BODY_TEXT}}" \
+        --region "$AWS_REGION"
+fi

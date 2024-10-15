@@ -1,0 +1,158 @@
+#! /bin/bash
+set -x -e
+rver=4.3.2
+rspkg=rstudio-server-rhel-2023.12.0-369-x86_64.rpm
+rspasswd=Trick90**ZX#
+sudo adduser pgx3874
+sudo sh -c "echo '$rspasswd' | passwd pgx3874 --stdin"
+usermod -aG wheel pgx3874
+sudo yum update -y
+sudo yum install -y bzip2-devel cairo-devel \
+     gcc gcc-c++ gcc-gfortran libXt-devel cmake \
+     libcurl-devel libjpeg-devel libpng-devel \
+     pango-devel pango libicu-devel wget git \
+     libtiff-devel pcre2-devel readline-devel jq \
+     texinfo texlive-collection-fontsrecommended \
+	   xz-devel awscli libxml2-devel
+sudo amazon-linux-extras install -y epel
+sudo yum install -y https://apache.jfrog.io/artifactory/arrow/amazon-linux/2/apache-arrow-release-latest.rpm
+sudo yum install -y --enablerepo=epel arrow-devel 
+sudo yum install -y --enablerepo=epel arrow-glib-devel 
+sudo yum install -y --enablerepo=epel arrow-dataset-devel 
+sudo yum install -y --enablerepo=epel arrow-dataset-glib-devel 
+sudo yum install -y --enablerepo=epel parquet-devel 
+sudo yum install -y --enablerepo=epel parquet-glib-devel 
+sudo yum install -y --enablerepo=epel udunits2-devel
+sudo amazon-linux-extras enable corretto8
+sudo yum install -y java-1.8.0-amazon-corretto-devel
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-amazon-corretto/
+mkdir /tmp/R-build
+cd /tmp/R-build
+curl -OL https://cran.r-project.org/src/base/R-4/R-$rver.tar.gz
+tar -xzf R-$rver.tar.gz
+cd R-$rver
+./configure --with-readline=yes --enable-R-profiling=no --enable-memory-profiling=no --enable-R-shlib --with-pic --prefix=/usr/local --with-x --with-libpng --with-jpeglib --with-cairo --enable-R-shlib --with-recommended-packages=yes
+make -j 8
+sudo make install
+cat << 'EOF' > /tmp/Renvextra
+JAVA_HOME="/usr/lib/jvm/java-1.8.0-amazon-corretto/"
+GITHUB_PAT="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"
+PATH="${PWD}:/usr/local/bin:${PATH}"
+EOF
+cat /tmp/Renvextra | sudo tee -a /usr/local/lib64/R/etc/Renviron
+sudo /usr/local/bin/R CMD javareconf
+curl -OL https://download2.rstudio.org/server/centos7/x86_64/$rspkg
+sudo mkdir -p /etc/rstudio
+sudo sh -c "echo 'auth-minimum-user-id=100' >> /etc/rstudio/rserver.conf"
+sudo yum install -y $rspkg
+sudo rstudio-server start
+sudo aws s3 sync s3://pgx-terraform/projects/pgx/PGx_Predictive_Model/ /home/pgx3874/
+sudo aws s3 sync s3://vhi-apcd/Codes/ /home/pgx3874/apcd_codes
+sudo chmod -R 777 /home/pgx3874
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort1/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort2/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort3/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort4/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort5/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort6/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort7/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort8/input_dataset
+sudo mkdir -p /home/pgx3874/Step9_Predictive_Model/cohort9/input_dataset
+sudo /usr/local/bin/R --no-save <<R_SCRIPT
+Sys.setenv(TZ='Etc/UCT')
+install.packages(c('reticulate','rmarkdown','caret','purrr','dplyr','here'), repos="http://cran.rstudio.com")
+R_SCRIPT
+wget https://www.python.org/ftp/python/3.9.16/Python-3.9.16.tgz
+tar xzf Python-3.9.16.tgz
+cd Python-3.9.16
+./configure --enable-optimizations --prefix=/usr/local --enable-shared
+sudo make altinstall
+export PATH="/usr/local/bin:$PATH"
+echo '/usr/local/lib' | sudo tee /etc/ld.so.conf.d/python3.9.conf
+sudo ldconfig
+PYTHON="$(which python3.9)"
+sudo $PYTHON -m pip install --upgrade pip
+sudo $PYTHON -m pip install boto3 ec2-metadata pyarrow s3fs fsspec pandas polars shap catboost matplotlib scikit-learn optuna
+sudo yum install -y amazon-cloudwatch-agent
+sudo chmod 777 /opt/aws/amazon-cloudwatch-agent/bin/
+sudo cat <<EOF > /opt/aws/amazon-cloudwatch-agent/bin/config.json
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "run_as_user": "cwagent"
+    },
+    "metrics": {
+        "append_dimensions": {
+            "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+            "InstanceId": "${aws:InstanceId}",
+            "InstanceType": "${aws:InstanceType}"
+        },
+        "metrics_collected": {
+            "cpu": {
+                "measurement": [
+                    "cpu_usage_idle",
+                    "cpu_usage_iowait",
+                    "cpu_usage_user",
+                    "cpu_usage_system",
+                    "cpu_usage_steal",
+                    "cpu_usage_nice",
+                    "cpu_usage_guest",
+                    "cpu_usage_guest_nice",
+                    "cpu_usage_irq",
+                    "cpu_usage_softirq"
+                ],
+                "metrics_collection_interval": 60,
+                "totalcpu": true
+            },
+            "disk": {
+                "measurement": [
+                    "used_percent",
+                    "inodes_free"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "/"
+                ]
+            },
+            "diskio": {
+                "measurement": [
+                    "io_time",
+                    "write_bytes",
+                    "read_bytes",
+                    "writes",
+                    "reads"
+                ],
+                "metrics_collection_interval": 60,
+                "resources": [
+                    "/"
+                ]
+            },
+            "mem": {
+                "measurement": [
+                    "mem_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            },
+            "swap": {
+                "measurement": [
+                    "swap_used_percent"
+                ],
+                "metrics_collection_interval": 60
+            }
+        }
+    }
+}
+EOF
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+SENDER="jerome.dixon@mushinsolutions.awsapps.com"
+RECIPIENT="dixonrj@vcu.edu"
+SUBJECT="Bootstrap Completed on EC2 Instance"
+AWS_REGION="us-east-1"
+BODY_TEXT="RStudio Server is successfully running on the instance."
+if systemctl is-active --quiet rstudio-server
+then aws ses send-email \
+        --from "$SENDER" \
+        --destination "ToAddresses=$RECIPIENT" \
+        --message "Subject={Data=$SUBJECT},Body={Text={Data=$BODY_TEXT}}" \
+        --region "$AWS_REGION"
+fi

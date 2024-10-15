@@ -1,0 +1,157 @@
+{
+    "Reservations": [
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-008677ef1baf82eaf",
+                    "InstanceId": "i-0379f2dd941e54b21",
+                    "InstanceType": "m5.12xlarge",
+                    "KeyName": "mushin_pgx",
+                    "LaunchTime": "2024-01-31T02:50:44+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "us-east-1a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
+                    "PrivateIpAddress": "172.31.25.3",
+                    "ProductCodes": [],
+                    "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
+                    "PublicIpAddress": "44.221.159.159",
+                    "State": {
+                        "Code": 16,
+                        "Name": "running"
+                    },
+                    "StateTransitionReason": "",
+                    "SubnetId": "subnet-5bfc3416",
+                    "VpcId": "vpc-b4e8bdce",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2024-01-31T02:50:45+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attached",
+                                "VolumeId": "vol-06f9def2d187e1314"
+                            }
+                        }
+                    ],
+                    "ClientToken": "3a10df2c-22cd-4db2-927c-308927897ba0",
+                    "EbsOptimized": true,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::535362115856:instance-profile/EC2_Spot",
+                        "Id": "AIPAXZJQRTEIJBVDDE6S6"
+                    },
+                    "InstanceLifecycle": "spot",
+                    "NetworkInterfaces": [
+                        {
+                            "Association": {
+                                "IpOwnerId": "535362115856",
+                                "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
+                                "PublicIp": "44.221.159.159"
+                            },
+                            "Attachment": {
+                                "AttachTime": "2024-01-31T02:50:44+00:00",
+                                "AttachmentId": "eni-attach-069505f3688312dab",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attached",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupName": "data-science-box",
+                                    "GroupId": "sg-0eb0da772c42415dd"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "0a:fe:61:b7:a7:bf",
+                            "NetworkInterfaceId": "eni-0a0acf3769937735c",
+                            "OwnerId": "535362115856",
+                            "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
+                            "PrivateIpAddress": "172.31.25.3",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Association": {
+                                        "IpOwnerId": "535362115856",
+                                        "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
+                                        "PublicIp": "44.221.159.159"
+                                    },
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
+                                    "PrivateIpAddress": "172.31.25.3"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-5bfc3416",
+                            "VpcId": "vpc-b4e8bdce",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "data-science-box",
+                            "GroupId": "sg-0eb0da772c42415dd"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "SpotInstanceRequestId": "sir-n1kpty8j",
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "Cool_Moon"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 24,
+                        "ThreadsPerCore": 2
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "applied",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 2,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2024-01-31T02:50:44+00:00",
+                    "PrivateDnsNameOptions": {
+                        "HostnameType": "ip-name",
+                        "EnableResourceNameDnsARecord": true,
+                        "EnableResourceNameDnsAAAARecord": false
+                    },
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default"
+                    },
+                    "CurrentInstanceBootMode": "legacy-bios"
+                }
+            ],
+            "OwnerId": "535362115856",
+            "ReservationId": "r-0a04c4f0bfc5211dd"
+        }
+    ]
+}

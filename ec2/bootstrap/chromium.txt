@@ -1,0 +1,19 @@
+#!/bin/bash
+set -eux
+
+yum update -y
+yum install -y java-1.8.0-openjdk-headless \
+     libXi-devel unzip GConf2-devel \
+     chromium xorg-x11-server-Xvfb 
+
+wget https://www.python.org/ftp/python/3.11.8/Python-3.11.8.tgz
+tar xzf Python-3.11.8.tgz
+cd Python-3.11.8
+./configure --enable-optimizations --prefix=/usr/local --enable-shared
+make altinstall
+export PATH="/usr/local/bin:$PATH"
+echo '/usr/local/lib' |  tee /etc/ld.so.conf.d/python3.11.conf
+ldconfig
+PYTHON="$(which python3.11)"
+$PYTHON -m pip install --upgrade pip
+$PYTHON -m pip install boto3 ec2-metadata selenium

@@ -1,0 +1,22 @@
+---
+title: "QR Code"
+format: html
+editor: visual
+---
+
+```{r}
+
+library(qrcode)
+
+link <- "https://us-east-1.quicksight.aws.amazon.com/sn/accounts/535362115856/dashboards/dc5bfae2-ec29-41d1-adc3-0a7d65a3b51c?directory_alias=vcu-pgx-analysis"
+
+# Generate QR code
+qr_code <- qr_code(link)
+
+
+png("qr_code.png")
+plot(qr_code)
+dev.off()
+
+```
+

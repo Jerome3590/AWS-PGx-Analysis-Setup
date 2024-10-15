@@ -1,0 +1,28 @@
+{
+    "Instances": [
+        {
+            "Id": "ci-08935702I1VKVZEM475P",
+            "Ec2InstanceId": "i-06e80cf06d7bfd013",
+            "PublicDnsName": "ec2-54-164-94-251.compute-1.amazonaws.com",
+            "PublicIpAddress": "54.164.94.251",
+            "PrivateDnsName": "ip-172-31-104-159.ec2.internal",
+            "PrivateIpAddress": "172.31.104.159",
+            "Status": {
+                "State": "BOOTSTRAPPING",
+                "StateChangeReason": {},
+                "Timeline": {
+                    "CreationDateTime": "2024-04-08T07:44:11.972000-04:00"
+                }
+            },
+            "InstanceGroupId": "ig-8FLI222UTS2W",
+            "Market": "ON_DEMAND",
+            "InstanceType": "m5.16xlarge",
+            "EbsVolumes": [
+                {
+                    "Device": "/dev/sdb",
+                    "VolumeId": "vol-058fa8ca6b76ef788"
+                }
+            ]
+        }
+    ]
+}

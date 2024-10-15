@@ -1,0 +1,49 @@
+---
+title: "EC2 Spot Instance"
+format: html
+editor: visual
+---
+
+### Setup local environment 
+
+For passing commands between R and Bash environments
+
+```{r sync-renv-bash}
+
+library(jsonlite)
+library(here)
+
+cwd <- here::here()
+
+Sys.setenv("CWD"=cwd)
+
+```
+
+```{bash}
+
+aws ec2 run-instances --cli-input-json file://spot_m5.json
+
+```
+
+```{bash}
+
+aws ec2 describe-instances --output json --profile pgx | tee ${CWD}/ec2-config/ec2_description.json
+
+```
+
+
+```{bash}
+
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --output json --profile pgx | tee ${CWD}/ec2-config/ec2_id.json
+
+
+```
+
+
+#### Allocate Elastic IP to AWS EMR Head Node
+
+```{sh allocate-elastic-ip}
+
+aws ec2 associate-address --instance-id ${EC2_NODE_ID} --allocation-id eipalloc-0d2b32dc1f19a9a4a --profile pgx
+
+```

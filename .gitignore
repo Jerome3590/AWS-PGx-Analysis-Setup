@@ -1,0 +1,16 @@
+
+*.Rproj.user
+*.Rhistory
+*.Rproj
+.secret
+.vs/*
+.vscode/*
+*.env
+*.docx
+*.pem
+
+
+
+cloudfront/*.csv
+cloudfront/keys
+
