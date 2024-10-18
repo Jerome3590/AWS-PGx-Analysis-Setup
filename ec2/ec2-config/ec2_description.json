@@ -5,44 +5,44 @@
             "Instances": [
                 {
                     "AmiLaunchIndex": 0,
-                    "ImageId": "ami-008677ef1baf82eaf",
-                    "InstanceId": "i-0379f2dd941e54b21",
-                    "InstanceType": "m5.12xlarge",
-                    "KeyName": "mushin_pgx",
-                    "LaunchTime": "2024-01-31T02:50:44+00:00",
+                    "ImageId": "ami-0e4a83a73c3504fe3",
+                    "InstanceId": "i-0fad3b305b130f40a",
+                    "InstanceType": "m5.16xlarge",
+                    "KeyName": "Mushin2",
+                    "LaunchTime": "2024-09-05T19:04:57+00:00",
                     "Monitoring": {
                         "State": "disabled"
                     },
                     "Placement": {
-                        "AvailabilityZone": "us-east-1a",
+                        "AvailabilityZone": "us-east-2a",
                         "GroupName": "",
                         "Tenancy": "default"
                     },
-                    "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
-                    "PrivateIpAddress": "172.31.25.3",
+                    "PrivateDnsName": "ip-172-31-0-96.us-east-2.compute.internal",
+                    "PrivateIpAddress": "172.31.0.96",
                     "ProductCodes": [],
-                    "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
-                    "PublicIpAddress": "44.221.159.159",
+                    "PublicDnsName": "ec2-3-137-10-187.us-east-2.compute.amazonaws.com",
+                    "PublicIpAddress": "3.137.10.187",
                     "State": {
-                        "Code": 16,
-                        "Name": "running"
+                        "Code": 80,
+                        "Name": "stopped"
                     },
-                    "StateTransitionReason": "",
-                    "SubnetId": "subnet-5bfc3416",
-                    "VpcId": "vpc-b4e8bdce",
+                    "StateTransitionReason": "User initiated (2024-09-05 19:20:46 GMT)",
+                    "SubnetId": "subnet-27a5404c",
+                    "VpcId": "vpc-5777853c",
                     "Architecture": "x86_64",
                     "BlockDeviceMappings": [
                         {
                             "DeviceName": "/dev/xvda",
                             "Ebs": {
-                                "AttachTime": "2024-01-31T02:50:45+00:00",
+                                "AttachTime": "2024-07-10T20:32:00+00:00",
                                 "DeleteOnTermination": true,
                                 "Status": "attached",
-                                "VolumeId": "vol-06f9def2d187e1314"
+                                "VolumeId": "vol-0bd5d73f4276b053f"
                             }
                         }
                     ],
-                    "ClientToken": "3a10df2c-22cd-4db2-927c-308927897ba0",
+                    "ClientToken": "59752317-46db-4267-9c89-af64edccded5",
                     "EbsOptimized": true,
                     "EnaSupport": true,
                     "Hypervisor": "xen",
@@ -55,12 +55,12 @@
                         {
                             "Association": {
                                 "IpOwnerId": "535362115856",
-                                "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
-                                "PublicIp": "44.221.159.159"
+                                "PublicDnsName": "ec2-3-137-10-187.us-east-2.compute.amazonaws.com",
+                                "PublicIp": "3.137.10.187"
                             },
                             "Attachment": {
-                                "AttachTime": "2024-01-31T02:50:44+00:00",
-                                "AttachmentId": "eni-attach-069505f3688312dab",
+                                "AttachTime": "2024-07-10T20:31:59+00:00",
+                                "AttachmentId": "eni-attach-067a4fc3e6c8ed210",
                                 "DeleteOnTermination": true,
                                 "DeviceIndex": 0,
                                 "Status": "attached",
@@ -69,32 +69,32 @@
                             "Description": "",
                             "Groups": [
                                 {
-                                    "GroupName": "data-science-box",
-                                    "GroupId": "sg-0eb0da772c42415dd"
+                                    "GroupName": "default",
+                                    "GroupId": "sg-fe79549c"
                                 }
                             ],
                             "Ipv6Addresses": [],
-                            "MacAddress": "0a:fe:61:b7:a7:bf",
-                            "NetworkInterfaceId": "eni-0a0acf3769937735c",
+                            "MacAddress": "02:7a:90:6e:64:0d",
+                            "NetworkInterfaceId": "eni-03cd1f33b006daf78",
                             "OwnerId": "535362115856",
-                            "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
-                            "PrivateIpAddress": "172.31.25.3",
+                            "PrivateDnsName": "ip-172-31-0-96.us-east-2.compute.internal",
+                            "PrivateIpAddress": "172.31.0.96",
                             "PrivateIpAddresses": [
                                 {
                                     "Association": {
                                         "IpOwnerId": "535362115856",
-                                        "PublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
-                                        "PublicIp": "44.221.159.159"
+                                        "PublicDnsName": "ec2-3-137-10-187.us-east-2.compute.amazonaws.com",
+                                        "PublicIp": "3.137.10.187"
                                     },
                                     "Primary": true,
-                                    "PrivateDnsName": "ip-172-31-25-3.ec2.internal",
-                                    "PrivateIpAddress": "172.31.25.3"
+                                    "PrivateDnsName": "ip-172-31-0-96.us-east-2.compute.internal",
+                                    "PrivateIpAddress": "172.31.0.96"
                                 }
                             ],
                             "SourceDestCheck": true,
                             "Status": "in-use",
-                            "SubnetId": "subnet-5bfc3416",
-                            "VpcId": "vpc-b4e8bdce",
+                            "SubnetId": "subnet-27a5404c",
+                            "VpcId": "vpc-5777853c",
                             "InterfaceType": "interface"
                         }
                     ],
@@ -102,21 +102,25 @@
                     "RootDeviceType": "ebs",
                     "SecurityGroups": [
                         {
-                            "GroupName": "data-science-box",
-                            "GroupId": "sg-0eb0da772c42415dd"
+                            "GroupName": "default",
+                            "GroupId": "sg-fe79549c"
                         }
                     ],
                     "SourceDestCheck": true,
-                    "SpotInstanceRequestId": "sir-n1kpty8j",
+                    "SpotInstanceRequestId": "sir-rnn6wdwk",
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
                     "Tags": [
                         {
                             "Key": "Name",
-                            "Value": "Cool_Moon"
+                            "Value": "Feng Shui"
                         }
                     ],
                     "VirtualizationType": "hvm",
                     "CpuOptions": {
-                        "CoreCount": 24,
+                        "CoreCount": 32,
                         "ThreadsPerCore": 2
                     },
                     "CapacityReservationSpecification": {
@@ -127,8 +131,8 @@
                     },
                     "MetadataOptions": {
                         "State": "applied",
-                        "HttpTokens": "required",
-                        "HttpPutResponseHopLimit": 2,
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
                         "HttpEndpoint": "enabled",
                         "HttpProtocolIpv6": "disabled",
                         "InstanceMetadataTags": "disabled"
@@ -138,7 +142,7 @@
                     },
                     "PlatformDetails": "Linux/UNIX",
                     "UsageOperation": "RunInstances",
-                    "UsageOperationUpdateTime": "2024-01-31T02:50:44+00:00",
+                    "UsageOperationUpdateTime": "2024-07-10T20:31:59+00:00",
                     "PrivateDnsNameOptions": {
                         "HostnameType": "ip-name",
                         "EnableResourceNameDnsARecord": true,
@@ -151,7 +155,7 @@
                 }
             ],
             "OwnerId": "535362115856",
-            "ReservationId": "r-0a04c4f0bfc5211dd"
+            "ReservationId": "r-05a85afe52acb00a1"
         }
     ]
 }
