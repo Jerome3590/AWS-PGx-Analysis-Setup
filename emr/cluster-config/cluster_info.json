@@ -1,19 +1,19 @@
 {
     "Clusters": [
         {
-            "Id": "j-2461548JEQH1B",
+            "Id": "j-38B4PTDE75ZVW",
             "Name": "PGx_emR",
             "Status": {
-                "State": "STARTING",
+                "State": "BOOTSTRAPPING",
                 "StateChangeReason": {
-                    "Message": "Provisioning Amazon EC2 capacity"
+                    "Message": "Running bootstrap actions"
                 },
                 "Timeline": {
-                    "CreationDateTime": "2024-04-08T07:44:03.204000-04:00"
+                    "CreationDateTime": "2024-10-29T08:47:39.562000-04:00"
                 }
             },
             "NormalizedInstanceHours": 0,
-            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-2461548JEQH1B"
+            "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-38B4PTDE75ZVW"
         }
     ]
 }

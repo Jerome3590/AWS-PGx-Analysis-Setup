@@ -1,0 +1,260 @@
+---
+title: "AWS EMR Cluster for PGx Analysis"
+author: "Jerome Dixon"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+editor: source
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    html-math-method: katex
+    df-print: paged
+    embed-resources: true
+    fontsize: "11pt"
+    code-fold: true
+    code-summary: "Show the code"
+    smooth-scroll: true
+editor_options: 
+  chunk_output_type: inline
+execute:
+  echo: true
+  message: false
+  warning: false
+  eval: false
+---
+
+### M7.12XLarge EMR Cluster (Sparklyr/PySpark bootstrap with Python3.7)
+
+- POSIT does not support AWS Linux 2023 so must use EMR 6.x with AWS Linux 2
+- EMR 6.x uses python3.7
+
+```{bash}
+
+aws emr create-cluster \
+ --name "PGx-Analysis-2024" \
+ --log-uri "s3://aws-logs-535362115856-us-east-1/elasticmapreduce" \
+ --release-label "emr-6.15.0" \
+ --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --security-configuration "pgx_emr2" \
+ --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":2,"MaximumCapacityUnits":20,"MaximumOnDemandCapacityUnits":20,"MaximumCoreCapacityUnits":20}}' \
+ --unhealthy-node-replacement \
+ --ec2-attributes '{"InstanceProfile":"EMR_EC2_DefaultRole","EmrManagedMasterSecurityGroup":"sg-063a1a27f01fac9b1","EmrManagedSlaveSecurityGroup":"sg-040af67bc708a5425","KeyName":"mushin_pgx","AdditionalMasterSecurityGroups":[],"AdditionalSlaveSecurityGroups":[],"SubnetId":"subnet-07950d9f2eb4d936d"}' \
+ --applications Name=Hadoop Name=Hive Name=Spark \
+ --configurations '[{"Classification":"hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}},{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
+ --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"Primary","InstanceType":"m7a.12xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":192},"VolumesPerInstance":4}]}},{"InstanceCount":1,"InstanceGroupType":"CORE","Name":"Core","InstanceType":"m7a.12xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":192},"VolumesPerInstance":4}]}}]' \
+ --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-repository/emr-config/pgx_ade_python37_bootstrap.sh"}]' \
+ --auto-scaling-role "arn:aws:iam::535362115856:role/EMR_AutoScaling_DefaultRole" \
+ --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
+ --ebs-root-volume-size "97" \
+ --auto-termination-policy '{"IdleTimeout":3600}' \
+ --region "us-east-1" \
+ --profile pgx
+
+```
+
+### Setup local environment 
+
+For passing commands between R and Bash environments
+
+```{r sync-renv-bash}
+
+library(jsonlite)
+library(here)
+
+cwd <- here::here()
+
+Sys.setenv("CWD"=cwd)
+
+```
+
+### Get EMR Cluster Info
+
+```{sh get-emr-cluster-id}
+
+aws emr list-clusters --active --profile pgx | tee ${CWD}/emr/cluster-config/cluster_info.json
+
+```
+
+
+```{r parse-emr-cluster-id}
+
+cluster_json <- read_json(here("emr","cluster-config","cluster_info.json"))
+
+cluster_id <- as.data.frame(cluster_json[["Clusters"]][[1]][["Id"]])
+
+names(cluster_id)  <- "cluster_id"
+
+write.table(cluster_id, here("emr","cluster-config","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+
+cluster_id
+
+# Save as environmental variable
+Sys.setenv("CLUSTER_ID"=cluster_id)
+
+```
+
+#### Cluster Configuration
+
+```{sh get-emr-cluster-config}
+
+aws emr describe-cluster --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/emr/cluster-config/cluster_description.json
+
+```
+
+
+```{r read-emr-cluster-config}
+
+cluster_description_json <- read_json(here("emr","cluster-config","cluster_description.json"))
+
+```
+
+#### Cluster Head Node
+
+```{sh get-emr-head-node}
+
+aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/emr/cluster-config/emr_node.json
+
+```
+
+```{r parse-emr-head-node-info}
+
+emr_json <- read_json(here("emr","cluster-config","emr_node.json"))
+
+emr_dns <- emr_json[["Instances"]][[1]][["PublicDnsName"]]
+
+emr_instance_id <- emr_json[["Instances"]][[1]][["Ec2InstanceId"]]
+
+emr_instance_id <- as.data.frame(emr_instance_id)
+
+write.table(emr_instance_id, here("emr","cluster-config","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+
+emr_dns
+
+emr_instance_id
+
+Sys.setenv("EMR_NODE_ID"=emr_instance_id)
+
+```
+
+#### Allocate Elastic IP to AWS EMR Head Node
+
+```{sh allocate-elastic-ip}
+
+aws ec2 associate-address --instance-id ${EMR_NODE_ID} --allocation-id eipalloc-0d2b32dc1f19a9a4a --profile pgx
+
+```
+
+Setup your elastic IP or use EMR head node DNS. Don't forget to add :8787 at the end for RStudio port
+Wait for cluster to build... {about 45 mins}
+
+### Go to work!
+
+```{r emr-rstudio-ip}
+
+url <- "http://44.221.159.159:8787"
+
+browseURL(url)
+
+```
+
+For failed cluster starts:
+
+```{bash}
+
+aws emr describe-cluster --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/emr/cluster-config/bad_cluster_info.json
+
+```
+
+### EMR Studio
+
+#### Permissions
+
+```{bash}
+
+aws emr list-studios --profile mushin
+
+
+```
+```{bash}
+
+aws emr describe-studio --studio-id es-17EXJHZCNPQ7I1NFSVQNCOOPL --profile pgx
+
+```
+
+
+```{bash}
+
+aws iam put-role-policy \
+    --role-name AmazonEMRStudio_ServiceRole_1732182987289 \
+    --policy-name AllowPassRoleForEMRExecution \
+    --policy-document file://pass_role.json \
+    --profile pgx
+
+```
+
+
+```{bash}
+
+aws iam get-role --role-name AmazonEMRStudio_RuntimeRole_1732182987289 --profile pgx
+
+```
+
+
+```{bash}
+
+aws iam get-role --role-name AmazonEMRStudio_RuntimeRole_1732182987289 --profile pgx
+
+```
+
+
+```{bash}
+
+aws iam update-assume-role-policy \
+    --role-name AmazonEMRStudio_RuntimeRole_1732182987289 \
+    --policy-document file://trust_policy.json \
+    --profile pgx
+
+```
+
+
+```{bash}
+
+aws iam attach-role-policy \
+    --role-name AmazonEMRStudio_RuntimeRole_1732182987289 \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceEditorsRole \
+    --profile pgx
+
+```
+
+
+```{bash}
+aws iam put-role-policy \
+    --role-name EMRStudio_User_Role \
+    --policy-name AllowAddTagsOnEMRClusters \
+    --policy-document file://add_tags_policy.json \
+    --profile pgx
+
+```
+
+#### EMR Studio Cluster
+
+```{bash}
+
+aws emr create-cluster \
+ --name "pgx-analysis-ascpt" \
+ --log-uri "s3://athena-output-testing-pgx/elasticmapreduce" \
+ --release-label "emr-7.5.0" \
+ --service-role "EMR_DefaultRole" \
+ --unhealthy-node-replacement \
+ --ec2-attributes '{"InstanceProfile":"EMR_EC2_DefaultRole","EmrManagedMasterSecurityGroup":"sg-0a5260eee9a20654e","EmrManagedSlaveSecurityGroup":"sg-0f01580b24ea364e1","ServiceAccessSecurityGroup":"sg-0e25102a082ef38d1","SubnetId":"subnet-03f689fd2cb8cbb2c"}' \
+ --tags 'creator=CREATE_CLUSTER_TAB_IN_JUPYTERLAB_PLUGIN' \
+ --applications Name=Spark Name=Hadoop Name=Livy Name=JupyterEnterpriseGateway \
+ --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"master","InstanceType":"m5.xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}]}},{"InstanceCount":2,"InstanceGroupType":"CORE","Name":"slave","InstanceType":"m5.xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}]}}]' \
+ --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
+ --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-repository/emr-config/pgx_emr_studio_python39_bootstrap.sh"}]' \
+ --auto-termination-policy '{"IdleTimeout":3600}' \
+ --region "us-east-1" \
+ --profile pgx
+```
+
+

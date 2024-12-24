@@ -4,11 +4,11 @@ rver=4.3.2
 rspkg=rstudio-server-rhel-2023.12.0-369-x86_64.rpm
 rspasswd=Trick90**ZX#
 USER="pgx3874"
-TARGET_DIR="/home/pgx3874/Time_Series_Analysis/"
+TARGET_DIR="/home/pgx-repo/"
 adduser $USER
 mkdir -p $TARGET_DIR
 chmod -R 777 $TARGET_DIR
-aws s3 sync s3://vr-sling/Analysis/ /home/pgx3874/
+aws s3 sync s3://pgx-repository/ade-risk-model/ /home/pgx-repo/ade-risk-model
 chown -R $USER:$USER $TARGET_DIR
 sh -c "echo '$rspasswd' | passwd pgx3874 --stdin"
 usermod -aG wheel $USER
@@ -55,23 +55,36 @@ rstudio-server start
 /usr/local/bin/R --no-save <<R_SCRIPT
 Sys.setenv(TZ='Etc/UCT')
 install.packages(c('reticulate','rmarkdown','caret','purrr','dplyr','tidyr','here'), repos="http://cran.rstudio.com")
-install.packages('remotes')
-remotes::install_url('https://github.com/catboost/catboost/releases/download/v1.2.3/catboost-R-linux-aarch64-1.2.3.tgz', INSTALL_opts = c("--no-multiarch", "--no-test-load"))
+install.packages('remotes', repos="http://cran.rstudio.com")
+remotes::install_url('https://github.com/catboost/catboost/releases/download/v1.2.7/catboost-R-linux-aarch64-1.2.7.tgz', INSTALL_opts = c("--no-multiarch", "--no-test-load"))
 R_SCRIPT
-wget https://www.python.org/ftp/python/3.11.3/Python-3.11.3.tgz
-tar xzf Python-3.11.3.tgz
-cd Python-3.11.3
-./configure --enable-optimizations --prefix=/usr/local --enable-shared
-make altinstall
+cd /usr/local/src
+curl https://sh.rustup.rs -sSf | sh
+sudo wget https://www.openssl.org/source/openssl-1.1.1q.tar.gz
+sudo tar xzf openssl-1.1.1q.tar.gz
+cd openssl-1.1.1q
+sudo ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
+sudo make
+sudo make install
+echo "/usr/local/openssl/lib" | sudo tee -a /etc/ld.so.conf.d/openssl-1.1.1q.conf
+sudo ldconfig
+export PATH=/usr/local/openssl/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/openssl/lib
+export CPPFLAGS="-I/usr/local/openssl/include"
+export LDFLAGS="-L/usr/local/openssl/lib"
+sudo yum -y install sqlite-devel gdbm-devel libdb-devel libffi-devel bzip2-devel xz-devel ncurses-devel readline-devel tk-devel
+wget https://www.python.org/ftp/python/3.12.7/Python-3.12.7.tgz
+tar xzf Python-3.12.7.tgz
+cd Python-3.12.7
+./configure --with-openssl=/usr/local/openssl --enable-optimizations --prefix=/usr/local --enable-shared
+make
+sudo make altinstall
 export PATH="/usr/local/bin:$PATH"
-echo '/usr/local/lib' |  tee /etc/ld.so.conf.d/python3.11.conf
+echo '/usr/local/lib' |  tee /etc/ld.so.conf.d/python3.12.conf
 ldconfig
-PYTHON="$(which python3.11)"
+PYTHON="$(which python3.12)"
 $PYTHON -m pip install --upgrade pip
-$PYTHON -m pip install boto3 ec2-metadata pyarrow pandas scikit-learn awswrangler
-git clone https://github.com/wannesm/dtaidistance.git
-cd dtaidistance
-python setup.py install
+$PYTHON -m pip install boto3 ec2-metadata pyarrow pandas scikit-learn dtaidistance tslearn catboost matplotlib shap
 yum install -y amazon-cloudwatch-agent
 chmod 777 /opt/aws/amazon-cloudwatch-agent/bin/
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)

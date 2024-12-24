@@ -1,14 +1,14 @@
 {
     "Cluster": {
-        "Id": "j-2461548JEQH1B",
+        "Id": "j-38B4PTDE75ZVW",
         "Name": "PGx_emR",
         "Status": {
-            "State": "STARTING",
+            "State": "BOOTSTRAPPING",
             "StateChangeReason": {
-                "Message": "Provisioning Amazon EC2 capacity"
+                "Message": "Running bootstrap actions"
             },
             "Timeline": {
-                "CreationDateTime": "2024-04-08T07:44:03.204000-04:00"
+                "CreationDateTime": "2024-10-29T08:47:39.562000-04:00"
             }
         },
         "Ec2InstanceAttributes": {
@@ -27,6 +27,7 @@
         "ReleaseLabel": "emr-6.15.0",
         "AutoTerminate": false,
         "TerminationProtected": true,
+        "UnhealthyNodeReplacement": false,
         "VisibleToAllUsers": true,
         "Applications": [
             {
@@ -45,6 +46,7 @@
         "Tags": [],
         "ServiceRole": "arn:aws:iam::535362115856:role/EMR_DefaultRole",
         "NormalizedInstanceHours": 0,
+        "MasterPublicDnsName": "ec2-44-221-159-159.compute-1.amazonaws.com",
         "Configurations": [
             {
                 "Classification": "spark-hive-site",
@@ -63,20 +65,20 @@
         "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
         "EbsRootVolumeSize": 97,
         "KerberosAttributes": {},
-        "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-2461548JEQH1B",
+        "ClusterArn": "arn:aws:elasticmapreduce:us-east-1:535362115856:cluster/j-38B4PTDE75ZVW",
         "StepConcurrencyLevel": 1,
         "PlacementGroups": [],
-        "OSReleaseLabel": "2.0.20240306.2",
+        "OSReleaseLabel": "2.0.20241014.0",
         "BootstrapActions": [
             {
                 "Name": "pgx",
-                "ScriptPath": "s3://pgx-terraform/emr-config/pgx_emr_python37_bootstrap.sh",
+                "ScriptPath": "s3://pgx-repository/emr-config/pgx_ade_python312_bootstrap.sh",
                 "Args": []
             }
         ],
         "InstanceGroups": [
             {
-                "Id": "ig-8FLI222UTS2W",
+                "Id": "ig-NRU5Y2O1SXUK",
                 "Name": "Primary",
                 "Market": "ON_DEMAND",
                 "InstanceGroupType": "MASTER",
@@ -84,12 +86,12 @@
                 "RequestedInstanceCount": 1,
                 "RunningInstanceCount": 0,
                 "Status": {
-                    "State": "PROVISIONING",
+                    "State": "BOOTSTRAPPING",
                     "StateChangeReason": {
                         "Message": ""
                     },
                     "Timeline": {
-                        "CreationDateTime": "2024-04-08T07:44:03.217000-04:00"
+                        "CreationDateTime": "2024-10-29T08:47:39.586000-04:00"
                     }
                 },
                 "Configurations": [],
@@ -108,39 +110,7 @@
                 "ShrinkPolicy": {}
             },
             {
-                "Id": "ig-3VMNICSWPDUN9",
-                "Name": "Task - 1",
-                "Market": "ON_DEMAND",
-                "InstanceGroupType": "TASK",
-                "InstanceType": "m5.16xlarge",
-                "RequestedInstanceCount": 5,
-                "RunningInstanceCount": 0,
-                "Status": {
-                    "State": "PROVISIONING",
-                    "StateChangeReason": {
-                        "Message": ""
-                    },
-                    "Timeline": {
-                        "CreationDateTime": "2024-04-08T07:44:03.217000-04:00"
-                    }
-                },
-                "Configurations": [],
-                "ConfigurationsVersion": 0,
-                "EbsBlockDevices": [
-                    {
-                        "VolumeSpecification": {
-                            "VolumeType": "gp3",
-                            "Iops": 3000,
-                            "SizeInGB": 100,
-                            "Throughput": 125
-                        },
-                        "Device": "/dev/sdb"
-                    }
-                ],
-                "ShrinkPolicy": {}
-            },
-            {
-                "Id": "ig-1ETT4W03UWIJF",
+                "Id": "ig-2EJPW10YULHK0",
                 "Name": "Core",
                 "Market": "ON_DEMAND",
                 "InstanceGroupType": "CORE",
@@ -148,12 +118,12 @@
                 "RequestedInstanceCount": 5,
                 "RunningInstanceCount": 0,
                 "Status": {
-                    "State": "PROVISIONING",
+                    "State": "BOOTSTRAPPING",
                     "StateChangeReason": {
                         "Message": ""
                     },
                     "Timeline": {
-                        "CreationDateTime": "2024-04-08T07:44:03.217000-04:00"
+                        "CreationDateTime": "2024-10-29T08:47:39.586000-04:00"
                     }
                 },
                 "Configurations": [],
@@ -186,6 +156,38 @@
                             "SizeInGB": 256
                         },
                         "Device": "/dev/sde"
+                    }
+                ],
+                "ShrinkPolicy": {}
+            },
+            {
+                "Id": "ig-34BIAI52WL5X6",
+                "Name": "Task - 1",
+                "Market": "ON_DEMAND",
+                "InstanceGroupType": "TASK",
+                "InstanceType": "m5.16xlarge",
+                "RequestedInstanceCount": 5,
+                "RunningInstanceCount": 0,
+                "Status": {
+                    "State": "PROVISIONING",
+                    "StateChangeReason": {
+                        "Message": ""
+                    },
+                    "Timeline": {
+                        "CreationDateTime": "2024-10-29T08:47:39.586000-04:00"
+                    }
+                },
+                "Configurations": [],
+                "ConfigurationsVersion": 0,
+                "EbsBlockDevices": [
+                    {
+                        "VolumeSpecification": {
+                            "VolumeType": "gp3",
+                            "Iops": 3000,
+                            "SizeInGB": 100,
+                            "Throughput": 125
+                        },
+                        "Device": "/dev/sdb"
                     }
                 ],
                 "ShrinkPolicy": {}

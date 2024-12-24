@@ -8,7 +8,7 @@ editor: visual
 
 library(qrcode)
 
-link <- "https://us-east-1.quicksight.aws.amazon.com/sn/accounts/535362115856/dashboards/dc5bfae2-ec29-41d1-adc3-0a7d65a3b51c?directory_alias=vcu-pgx-analysis"
+link <- "https://us-east-1.quicksight.aws.amazon.com/sn/accounts/535362115856/dashboards/a10b7515-63c9-4cb9-8774-8a34f27e4ffd?directory_alias=vcu-pgx-analysis"
 
 # Generate QR code
 qr_code <- qr_code(link)
@@ -19,4 +19,3 @@ plot(qr_code)
 dev.off()
 
 ```
-

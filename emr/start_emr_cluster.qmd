@@ -52,7 +52,7 @@ CatBoost not optimized for GPU. Using (1) m5.16xlarge Driver Node with (10) m5.1
 ```{bash}
 
 aws emr create-cluster \
- --name "PGx_SomePy" \
+ --name "PGx_PySpark" \
  --log-uri "s3n://aws-logs-535362115856-us-east-1/elasticmapreduce/" \
  --release-label "emr-6.15.0" \
  --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
@@ -72,7 +72,7 @@ aws emr create-cluster \
 
 ```
 
-### M5.16XLarge EMR Cluster (Sparklyr/PySpark bootstrap with Python3.7) 
+### M5.16XLarge EMR Cluster (Sparklyr/PySpark bootstrap with Python3.12) 
 
 ```{bash}
 
@@ -88,7 +88,7 @@ aws emr create-cluster \
  --applications Name=Hadoop Name=Hive Name=Spark \
  --configurations '[{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}},{"Classification":"hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
  --instance-groups '[{"InstanceCount":5,"InstanceGroupType":"CORE","Name":"Core","InstanceType":"m5.16xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":256},"VolumesPerInstance":4}]}},{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"Primary","InstanceType":"m5.16xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp3","Iops":3000,"SizeInGB":100,"Throughput":125},"VolumesPerInstance":1}]}},{"InstanceCount":5,"InstanceGroupType":"TASK","Name":"Task - 1","InstanceType":"m5.16xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp3","Iops":3000,"SizeInGB":100,"Throughput":125},"VolumesPerInstance":1}]}}]' \
- --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-terraform/emr-config/pgx_emr_python37_bootstrap.sh"}]' \
+ --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-repository/emr-config/pgx_ade_python312_bootstrap.sh"}]' \
  --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
  --ebs-root-volume-size "97" \
  --auto-termination-policy '{"IdleTimeout":3600}' \
@@ -112,24 +112,25 @@ cwd <- here::here()
 Sys.setenv("CWD"=cwd)
 
 ```
+
 ### Get EMR Cluster Info
 
 ```{sh get-emr-cluster-id}
 
-aws emr list-clusters --active --profile pgx | tee ${CWD}/cluster-config/cluster_info.json
+aws emr list-clusters --active --profile pgx | tee ${CWD}/emr/cluster-config/cluster_info.json
 
 ```
 
 
 ```{r parse-emr-cluster-id}
 
-cluster_json <- read_json(here("cluster-config","cluster_info.json"))
+cluster_json <- read_json(here("emr","cluster-config","cluster_info.json"))
 
 cluster_id <- as.data.frame(cluster_json[["Clusters"]][[1]][["Id"]])
 
 names(cluster_id)  <- "cluster_id"
 
-write.table(cluster_id, here("cluster-config","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+write.table(cluster_id, here("emr","cluster-config","cluster_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
 
 cluster_id
 
@@ -137,11 +138,12 @@ cluster_id
 Sys.setenv("CLUSTER_ID"=cluster_id)
 
 ```
+
 #### Cluster Configuration
 
 ```{sh get-emr-cluster-config}
 
-aws emr describe-cluster --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/cluster-config/cluster_description.json
+aws emr describe-cluster --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/emr/cluster-config/cluster_description.json
 
 ```
 
@@ -149,7 +151,7 @@ aws emr describe-cluster --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/c
 ```{r read-emr-cluster-config}
 
 
-cluster_description_json <- read_json(here("cluster-config","cluster_description.json"))
+cluster_description_json <- read_json(here("emr","cluster-config","cluster_description.json"))
 
 
 ```
@@ -158,7 +160,7 @@ cluster_description_json <- read_json(here("cluster-config","cluster_description
 
 ```{sh get-emr-head-node}
 
-aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/cluster-config/emr_node.json
+aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} --profile pgx | tee ${CWD}/emr/cluster-config/emr_node.json
 
 ```
 
@@ -166,7 +168,7 @@ aws emr list-instances --instance-group-type MASTER --cluster-id ${CLUSTER_ID} -
 
 ```{r parse-emr-head-node-info}
 
-emr_json <- read_json(here("cluster-config","emr_node.json"))
+emr_json <- read_json(here("emr","cluster-config","emr_node.json"))
 
 emr_dns <- emr_json[["Instances"]][[1]][["PublicDnsName"]]
 
@@ -174,7 +176,7 @@ emr_instance_id <- emr_json[["Instances"]][[1]][["Ec2InstanceId"]]
 
 emr_instance_id <- as.data.frame(emr_instance_id)
 
-write.table(emr_instance_id, here("cluster-config","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
+write.table(emr_instance_id, here("emr","cluster-config","emr_instance_id.csv"), sep = ";", col.names = FALSE, row.names = FALSE)
 
 emr_dns
 
