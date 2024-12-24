@@ -1,5 +1,5 @@
 ---
-title: "EMR Studio Pipeline"
+title: "EMR Studio: Drug Feature Analysis Jupyter Notebook Pipeline"
 format: html
 editor: visual
 ---
