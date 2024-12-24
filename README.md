@@ -56,7 +56,8 @@ The goal of this project is to investigate how Hospitals can improve their reach
 </br>
 
 
-## 4. Patient Implementation: From ML Model to Digital Health Integration (Hospital and Patient Operational Excellence) 
+## 4. Patient Implementation: From ML Model to Digital Health Integration  
+(Improved Hospital Operational Excellence and Patient Outcomes) 
 
 
 
