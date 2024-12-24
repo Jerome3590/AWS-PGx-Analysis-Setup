@@ -34,7 +34,7 @@ aws emr create-cluster \
  --name "PGx-Analysis-2024" \
  --log-uri "s3://aws-logs-535362115856-us-east-1/elasticmapreduce" \
  --release-label "emr-6.15.0" \
- --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --service-role "arn:aws:iam::$aws_account:role/EMR_DefaultRole" \
  --security-configuration "pgx_emr2" \
  --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":2,"MaximumCapacityUnits":20,"MaximumOnDemandCapacityUnits":20,"MaximumCoreCapacityUnits":20}}' \
  --unhealthy-node-replacement \
@@ -43,7 +43,7 @@ aws emr create-cluster \
  --configurations '[{"Classification":"hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}},{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
  --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"Primary","InstanceType":"m7a.12xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":192},"VolumesPerInstance":4}]}},{"InstanceCount":1,"InstanceGroupType":"CORE","Name":"Core","InstanceType":"m7a.12xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":192},"VolumesPerInstance":4}]}}]' \
  --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-repository/emr-config/pgx_ade_python37_bootstrap.sh"}]' \
- --auto-scaling-role "arn:aws:iam::535362115856:role/EMR_AutoScaling_DefaultRole" \
+ --auto-scaling-role "arn:aws:iam::$aws_account:role/EMR_AutoScaling_DefaultRole" \
  --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
  --ebs-root-volume-size "97" \
  --auto-termination-policy '{"IdleTimeout":3600}' \
@@ -175,6 +175,8 @@ aws emr list-studios --profile mushin
 
 
 ```
+
+
 ```{bash}
 
 aws emr describe-studio --studio-id es-17EXJHZCNPQ7I1NFSVQNCOOPL --profile pgx

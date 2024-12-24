@@ -10,7 +10,7 @@ All Payers Claim Database (APCD). Below is a detailed explanation for each step 
 
 ## Workflow Steps
 
-### **1. Initial Data Preprocessing**
+### **1. Initial Dataset Preprocessing**
 #### **1.1 Age Cohort Creation**
 The dataset is segmented into **9 age cohorts** based on the following age ranges:
 - 0–12
@@ -34,10 +34,10 @@ This preprocessing step is critical for reducing noise and improving model accur
 
 ---
 
-### **2. Feature Importance Model**
+### **2. Initial Feature Importance Model**
 The first model is trained using the preprocessed data to determine the **initial feature importance**. The steps include:
-- Training a CatBoost model on the dataset.
-- Extracting feature importance scores for all features.
+- Training a CatBoost model on the dataset with PySpark implementation.
+- Extracting feature importance scores for all features with Scala Apache Spark API.
 
 These scores help identify which features contribute most to the predictive power of the model.
 
@@ -45,14 +45,17 @@ These scores help identify which features contribute most to the predictive powe
 
 ### **3. Dataset Filtering and Model Refinement**
 Using the feature importance scores from Step 2:
-1. Filter the dataset to retain only the most important features (based on a predefined threshold).
+1. Filter the dataset to retain only the most important features (clustered features by the number of matches and mean feature importance score).
+
+
+### **4. Final Feature Importance Model**
 2. Retrain a new CatBoost model using this reduced feature set.
 
 This step ensures that only relevant features are included, improving model efficiency and interpretability.
 
 ---
 
-### **4. Training and Test Feature Importances**
+### **5. Training and Test Feature Importances**
 From the refined model:
 - Extract feature importance scores for both training and test datasets.
 - Compare these scores to validate that important features remain consistent across datasets.
@@ -61,7 +64,7 @@ This ensures that the model generalizes well and avoids overfitting.
 
 ---
 
-### **5. Feature Interaction Analysis**
+### **6. Feature Interaction Analysis**
 Using the refined CatBoost model:
 1. Analyze **feature importance interactions** to identify how pairs of features interact with each other.
 2. Use this information to uncover deeper insights into relationships between features and their combined impact on predictions.
@@ -70,11 +73,11 @@ CatBoost's built-in tools for interaction analysis are leveraged in this step.
 
 ---
 
-### **6. Plotting Partial Dependency**
-#### **6.1 Partial Dependency Plots**
+### **7. Plotting Partial Dependency**
+#### **7.1 Partial Dependency Plots**
 Generate **Partial Dependency Plots (PDPs)** to visualize how individual features impact model predictions.
 
-#### **6.2 Partial Dependency Interaction Plots**
+#### **7.2 Partial Dependency Interaction Plots**
 Generate **Partial Dependency Interaction Plots** to visualize how interactions between two features influence predictions.
 
 ---
@@ -122,21 +125,15 @@ Ensure that your environment is properly configured with these dependencies befo
 ## Output
 
 The workflow will produce:
-1. A list of initial feature importance scores.
-2. A reduced dataset containing only important features.
-3. Training and test feature importance scores from the refined model.
+1. Feature importance scores from PySpark trained model.
+2. A reduced dataset containing important features based on 10 independent model runs.
+(The number of matches and mean feature importance across each model run used to filter top features)
+3. Feature importance scores from the refined model.
 4. Feature interaction analysis results.
 5. Partial Dependency and Interaction Plots.
 
 ---
 
-## Notes
-- Ensure proper handling of missing values during preprocessing.
-- Hyperparameter tuning may be required for optimal CatBoost performance.
-- Use Spark's distributed capabilities for large datasets to improve processing efficiency.
-
----
-
 ## References
-For more details on CatBoost and its functionality, refer to its official documentation.
+- CatBoost Documentation: https://catboost.ai/docs/en/
 

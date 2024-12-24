@@ -2,7 +2,7 @@
 set -eux
 rver=4.3.2
 rspkg=rstudio-server-rhel-2023.12.0-369-x86_64.rpm
-rspasswd=Trick90**ZX#
+rspasswd=$rstudio_server_pwd
 USER="pgx3874"
 TARGET_DIR="/home/pgx3874/Step9_Predictive_Model/"
 adduser $USER
@@ -43,7 +43,7 @@ make -j 8
 make install
 cat << 'EOF' > /tmp/Renvextra
 JAVA_HOME="/usr/lib/jvm/java-1.8.0-amazon-corretto/"
-GITHUB_PAT="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"
+GITHUB_PAT=$GITHUB_PAT
 PATH="${PWD}:/usr/local/bin:${PATH}"
 EOF
 cat /tmp/Renvextra |  tee -a /usr/local/lib64/R/etc/Renviron
@@ -145,8 +145,8 @@ EOF
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
 id cwagent || useradd cwagent
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-SENDER="jerome.dixon@mushinsolutions.awsapps.com"
-RECIPIENT="dixonrj@vcu.edu"
+SENDER=$sender_email
+RECIPIENT=$recipient_email
 SUBJECT="Bootstrap Completed on EC2 Instance: $INSTANCE_ID"
 AWS_REGION="us-east-1"
 BODY_TEXT="RStudio Server is successfully running on instance: $INSTANCE_ID."

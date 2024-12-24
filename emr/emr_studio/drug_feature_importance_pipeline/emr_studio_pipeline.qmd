@@ -8,13 +8,14 @@ editor: visual
 
 ### Start Cluster
 
+
 ```{bash}
 
 aws emr create-cluster \
  --name "pgx-analysis-ascpt" \
  --log-uri "s3://athena-output-testing-pgx/elasticmapreduce" \
  --release-label "emr-7.5.0" \
- --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --service-role "arn:aws:iam::$aws_account:role/EMR_DefaultRole" \
  --security-configuration "pgx_emr2" \
  --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":3,"MaximumCapacityUnits":100,"MaximumOnDemandCapacityUnits":100,"MaximumCoreCapacityUnits":100}}' \
  --unhealthy-node-replacement \
@@ -24,7 +25,7 @@ aws emr create-cluster \
  --configurations '[{"Classification":"livy-conf","Properties":{"livy.server.session.timeout":"6h","livy.spark.deploy-mode":"cluster"}},{"Classification":"spark-hive-site","Properties":{"hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"}}]' \
  --instance-groups '[{"InstanceCount":1,"InstanceGroupType":"MASTER","Name":"master","InstanceType":"m2.2xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}],"EbsOptimized":false}},{"InstanceCount":3,"InstanceGroupType":"CORE","Name":"slave","InstanceType":"m2.2xlarge","EbsConfiguration":{"EbsBlockDeviceConfigs":[{"VolumeSpecification":{"VolumeType":"gp2","SizeInGB":32},"VolumesPerInstance":2}],"EbsOptimized":false}}]' \
  --bootstrap-actions '[{"Args":[],"Name":"pgx","Path":"s3://pgx-repository/emr-config/pgx_emr_studio_python39_bootstrap.sh"}]' \
- --auto-scaling-role "arn:aws:iam::535362115856:role/EMR_AutoScaling_DefaultRole" \
+ --auto-scaling-role "arn:aws:iam::$aws_account:role/EMR_AutoScaling_DefaultRole" \
  --scale-down-behavior "TERMINATE_AT_TASK_COMPLETION" \
  --ebs-root-volume-size "97" \
  --auto-termination-policy '{"IdleTimeout":3600}' \
@@ -51,11 +52,7 @@ aws emr describe-studio --studio-id $STUDIO_ID --profile pgx
 
 ### Workspace ID (AWS Console)
 
-```{bash}
-
-workspace_id = 'e-EBO8QCTW0J9YYPNH4RG8Q247P'
-
-```
+![Workspace Id](images/workspace_id.png)
 
 ### Cluster ID
 

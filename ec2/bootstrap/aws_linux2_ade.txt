@@ -2,7 +2,7 @@
 set -x -e
 rver=4.3.2
 rspkg=rstudio-server-rhel-2023.12.0-369-x86_64.rpm
-rspasswd=Trick90**ZX#
+rspasswd=$rstudio_server_pwd
 sudo adduser pgx3874
 sudo sh -c "echo '$rspasswd' | passwd pgx3874 --stdin"
 usermod -aG wheel pgx3874
@@ -36,7 +36,7 @@ make -j 8
 sudo make install
 cat << 'EOF' > /tmp/Renvextra
 JAVA_HOME="/usr/lib/jvm/java-1.8.0-amazon-corretto/"
-GITHUB_PAT="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"
+GITHUB_PAT=$GITHUB_PAT
 PATH="${PWD}:/usr/local/bin:${PATH}"
 EOF
 cat /tmp/Renvextra | sudo tee -a /usr/local/lib64/R/etc/Renviron
@@ -144,8 +144,8 @@ sudo cat <<EOF > /opt/aws/amazon-cloudwatch-agent/bin/config.json
 }
 EOF
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
-SENDER="jerome.dixon@mushinsolutions.awsapps.com"
-RECIPIENT="dixonrj@vcu.edu"
+SENDER=$sender_email_address
+RECIPIENT=$recipient_email_address
 SUBJECT="Bootstrap Completed on EC2 Instance"
 AWS_REGION="us-east-1"
 BODY_TEXT="RStudio Server is successfully running on the instance."

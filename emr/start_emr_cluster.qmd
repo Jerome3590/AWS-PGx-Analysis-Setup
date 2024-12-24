@@ -29,9 +29,9 @@ execute:
 
 aws emr create-cluster \
  --name "PGx_Py_GPU" \
- --log-uri "s3n://aws-logs-535362115856-us-east-1/elasticmapreduce/" \
+ --log-uri "s3n://aws-logs-$aws_account-us-east-1/elasticmapreduce/" \
  --release-label "emr-6.15.0" \
- --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --service-role "arn:aws:iam::$aws_account:role/EMR_DefaultRole" \
  --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":2,"MaximumCapacityUnits":4,"MaximumOnDemandCapacityUnits":3,"MaximumCoreCapacityUnits":3}}' \
  --ec2-attributes '{"InstanceProfile":"EMR_EC2_DefaultRole","EmrManagedMasterSecurityGroup":"sg-063a1a27f01fac9b1","EmrManagedSlaveSecurityGroup":"sg-040af67bc708a5425","SubnetId":"subnet-07950d9f2eb4d936d"}' \
  --applications Name=Hadoop Name=Spark \
@@ -53,9 +53,9 @@ CatBoost not optimized for GPU. Using (1) m5.16xlarge Driver Node with (10) m5.1
 
 aws emr create-cluster \
  --name "PGx_PySpark" \
- --log-uri "s3n://aws-logs-535362115856-us-east-1/elasticmapreduce/" \
+ --log-uri "s3n://aws-logs-$aws_account-us-east-1/elasticmapreduce/" \
  --release-label "emr-6.15.0" \
- --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --service-role "arn:aws:iam::$aws_account:role/EMR_DefaultRole" \
  --security-configuration "pgx_emr2" \
  --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":2,"MaximumCapacityUnits":20,"MaximumOnDemandCapacityUnits":20,"MaximumCoreCapacityUnits":20}}' \
  --termination-protected \
@@ -78,9 +78,9 @@ aws emr create-cluster \
 
 aws emr create-cluster \
  --name "PGx_emR" \
- --log-uri "s3n://aws-logs-535362115856-us-east-1/elasticmapreduce/" \
+ --log-uri "s3n://aws-logs-$aws_account-us-east-1/elasticmapreduce/" \
  --release-label "emr-6.15.0" \
- --service-role "arn:aws:iam::535362115856:role/EMR_DefaultRole" \
+ --service-role "arn:aws:iam::$aws_account:role/EMR_DefaultRole" \
  --security-configuration "pgx_emr2" \
  --managed-scaling-policy '{"ComputeLimits":{"UnitType":"Instances","MinimumCapacityUnits":2,"MaximumCapacityUnits":20,"MaximumOnDemandCapacityUnits":20,"MaximumCoreCapacityUnits":20}}' \
  --termination-protected \

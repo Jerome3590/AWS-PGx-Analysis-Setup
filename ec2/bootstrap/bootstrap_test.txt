@@ -79,8 +79,8 @@ EOF
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
 id cwagent || useradd cwagent
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-SENDER="jerome.dixon@mushinsolutions.awsapps.com"
-RECIPIENT="dixonrj@vcu.edu"
+SENDER=$sender_email
+RECIPIENT=$recipient_email
 SUBJECT="Bootstrap Completed on EC2 Instance: $INSTANCE_ID"
 AWS_REGION="us-east-1"
 BODY_TEXT="RStudio Server is successfully running on instance: $INSTANCE_ID."

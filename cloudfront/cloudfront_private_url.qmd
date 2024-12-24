@@ -44,8 +44,7 @@ print("Origin Access Control ARN:", oac_arn)
 
 ### Upload .html content to AWS S3
 
-- Bucket: 'jdixon-ils-research'
-          Domain name: jdixon-ils-research.s3.us-east-1.amazonaws.com'
+-   Bucket: 'jdixon-ils-research' Domain name: jdixon-ils-research.s3.us-east-1.amazonaws.com'
 
 ### Create CloudFront Distribution for S3 Bucket
 
@@ -66,7 +65,7 @@ origin = {
 
 # Define the distribution configuration
 distribution = {
-    'CallerReference': 'ils-dashboard-2024',
+    'CallerReference': 'ils-dashboard-2025',
     'Comment': 'ILS Dashboard',
     'Enabled': True,
     'Origins': {
@@ -196,9 +195,9 @@ with open('keys/public_key.pem', 'r') as f:
 # Define the AWS profile and bucket name
 profile_name="mushin"
 bucket_project="jdixon-ils-research"
-key_pair_id="K3FDX9U37CBBBO"
+key_pair_id=$key_pair_id
 private_key_path="keys/private_key.pem"
-expiration_date="2024-11-27"
+expiration_date="2025-11-27"
 
 # File to store the resulting CSV
 output_csv="signed_urls.csv"
@@ -211,7 +210,7 @@ html_files=$(aws s3api list-objects-v2 --bucket $bucket_project --query "Content
 
 # Loop through each HTML file to generate a signed URL
 for html_file in $html_files; do
-    signed_url=$(aws cloudfront sign --url "https://d1nbcefqu4d4e0.cloudfront.net/${html_file}" --key-pair-id $key_pair_id --private-key file://$private_key_path --date-less-than "$expiration_date" --profile $profile_name)
+    signed_url=$(aws cloudfront sign --url "https://$distribution_id.cloudfront.net/${html_file}" --key-pair-id $key_pair_id --private-key file://$private_key_path --date-less-than "$expiration_date" --profile $profile_name)
     
     # Append the HTML file path and its signed URL to the CSV
     echo "$html_file,$signed_url" >> $output_csv
@@ -249,11 +248,12 @@ url_qs[[1,2]]
 write_csv(url_qs,"quicksight_urls.csv")
 ```
 
-
 ```{r}
 
+distribution_id <- Sys.getenv('distribution_id')
+
 # Define the part to remove
-part_to_remove <- "https://d1nbcefqu4d4e0.cloudfront.net/analysis_workflow1/"
+part_to_remove <- paste0("https://",distribution_id,".cloudfront.net/analysis_workflow1/")
 
 # Remove the specified part from the URL
 clean_url <- gsub(part_to_remove, "", url)
@@ -281,11 +281,11 @@ cat(quicksight_expression)
 ```
 
 ```{r}
+
 # Loop through the URLs and open each one
 apply(url_test[, 2, drop = FALSE], 1, function(url) {
   browseURL(as.character(url))
 })
-
 
 
 ```
@@ -295,12 +295,15 @@ apply(url_test[, 2, drop = FALSE], 1, function(url) {
 ```{python}
 
 import boto3
+import os
 
 session = boto3.Session(profile_name='mushin')
 client = session.client('cloudfront')
 
 # Specify the ID of your distribution
-distribution_id = 'E3FKBD5BT7YMAT'
+distribution_id = os.environ.get('distribution_id')
+aws_account = os.environ.get('aws_account')
+
 
 # Get the current distribution config
 response = client.get_distribution_config(Id=distribution_id)
@@ -311,7 +314,7 @@ etag = response['ETag']
 config['Logging'] = {
     'Enabled': True,
     'IncludeCookies': True,
-    'Bucket': 'aws-logs-535362115856-us-east-1.s3.amazonaws.com',
+    'Bucket': f'aws-logs-{aws_account}-us-east-1.s3.amazonaws.com',
     'Prefix': 'dashboard/'
 }
 
@@ -319,5 +322,3 @@ config['Logging'] = {
 client.update_distribution(DistributionConfig=config, Id=distribution_id, IfMatch=etag)
 
 ```
-
-

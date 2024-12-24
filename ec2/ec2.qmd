@@ -66,4 +66,3 @@ aws ec2 associate-address --instance-id ${EC2_ID} --allocation-id eipalloc-06014
 ```{bash}
 pwd
 ```
-
