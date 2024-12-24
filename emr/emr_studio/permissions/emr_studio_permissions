@@ -67,14 +67,14 @@
             "Sid": "IamCreateRolePolicyPermission",
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:iam::535362115856:role/EMRStudio_Service_Role",
-                "arn:aws:iam::535362115856:role/EMRStudio_User_Role",
-                "arn:aws:iam::535362115856:role/ClusterTemplateLaunchRole",
-                "arn:aws:iam::535362115856:policy/EMRStudio_Basic_User_Policy",
-                "arn:aws:iam::535362115856:policy/EMRStudio_Intermediate_User_Policy",
-                "arn:aws:iam::535362115856:policy/EMRStudio_Advanced_User_Policy",
-                "arn:aws:iam::535362115856:policy/EMRStudioServiceRolePolicy",
-                "arn:aws:iam::535362115856:policy/ClusterTemplateLaunchConstraintPolicy"
+                "arn:aws:iam::{aws_account_id}:role/EMRStudio_Service_Role",
+                "arn:aws:iam::{aws_account_id}:role/EMRStudio_User_Role",
+                "arn:aws:iam::{aws_account_id}:role/ClusterTemplateLaunchRole",
+                "arn:aws:iam::{aws_account_id}:policy/EMRStudio_Basic_User_Policy",
+                "arn:aws:iam::{aws_account_id}:policy/EMRStudio_Intermediate_User_Policy",
+                "arn:aws:iam::{aws_account_id}:policy/EMRStudio_Advanced_User_Policy",
+                "arn:aws:iam::{aws_account_id}:policy/EMRStudioServiceRolePolicy",
+                "arn:aws:iam::{aws_account_id}:policy/ClusterTemplateLaunchConstraintPolicy"
             ],
             "Action": [
                 "iam:AttachRolePolicy",
@@ -99,7 +99,7 @@
             "Sid": "CloudformationPermission",
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:cloudformation:us-east-1:535362115856:stack/emr-studio-dependencies/*"
+                "arn:aws:cloudformation:us-east-1:{aws_account_id}:stack/emr-studio-dependencies/*"
             ],
             "Action": [
                 "cloudformation:CreateStack",
@@ -129,10 +129,10 @@
             "Sid": "ServiceCatalogCreatePortfolioProductsPermission",
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:servicecatalog:us-east-1:535362115856:*",
-                "arn:aws:servicecatalog:us-east-1:535362115856:*/*",
-                "arn:aws:catalog:us-east-1:535362115856:portfolio/*",
-                "arn:aws:catalog:us-east-1:535362115856:product/*"
+                "arn:aws:servicecatalog:us-east-1:{aws_account_id}:*",
+                "arn:aws:servicecatalog:us-east-1:{aws_account_id}:*/*",
+                "arn:aws:catalog:us-east-1:{aws_account_id}:portfolio/*",
+                "arn:aws:catalog:us-east-1:{aws_account_id}:product/*"
             ],
             "Action": [
                 "servicecatalog:CreatePortfolio",
@@ -164,7 +164,7 @@
         {
             "Sid": "ServiceCatalogProductPassLaunchConstraintPermission",
             "Effect": "Allow",
-            "Resource": "arn:aws:iam::535362115856:role/ClusterTemplateLaunchRole",
+            "Resource": "arn:aws:iam::{aws_account_id}:role/ClusterTemplateLaunchRole",
             "Action": [
                 "iam:PassRole"
             ],
