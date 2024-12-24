@@ -1,6 +1,6 @@
 
 ## Title: 
-Improving Hospital Operational Excellence and Patient Operational Excellence with Precision Medicine: A Case Study Utilizing Virginia’s All Payers Claim Database (APCD) and the FDA's Adverse Drug Event Reporting System (FAERS)
+Improving Both Hospital Operational Excellence and Patient Outcomes with Precision Medicine: A Case Study Utilizing Virginia’s All Payers Claim Database (APCD) and the FDA's Adverse Drug Event Reporting System (FAERS)
 
 ## Project Summary:
 
