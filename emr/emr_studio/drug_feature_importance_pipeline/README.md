@@ -3,7 +3,7 @@
 
 ## Overview
 This project implements a machine learning workflow using the **CatBoost** algorithm in combination with **Apache Spark**. 
-The workflow includes preprocessing steps, feature importance analysis, and interaction analysis to derive insights from 
+The workflow includes preprocessing steps, feature importance analysis, and interaction analysis to derive insights from Virginia's
 All Payers Claim Database (APCD). Below is a detailed explanation for each step in the pipeline supported by Jupyter notebooks.
 
 ---
@@ -30,7 +30,7 @@ Drug names in the dataset are standardized and consolidated to ensure consistenc
 - Removing duplicates or variations of the same drug name.
 - Normalizing drug names (e.g., case formatting, removing special characters).
 
-This preprocessing step is critical for reducing noise and improving model accuracy.
+This preprocessing step is necessary for reducing noise and improving model accuracy.
 
 ---
 
@@ -49,9 +49,9 @@ Using the feature importance scores from Step 2:
 
 
 ### **4. Final Feature Importance Model**
-2. Retrain a new CatBoost model using this reduced feature set.
+2. Retrain a new CatBoost model using the filtered by feature importance feature set.
 
-This step ensures that only relevant features are included, improving model efficiency and interpretability.
+This step ensures that only relevant features are included, improving model efficiency, accuracy, and interpretability.
 
 ---
 
@@ -60,7 +60,7 @@ From the refined model:
 - Extract feature importance scores for both training and test datasets.
 - Compare these scores to validate that important features remain consistent across datasets.
 
-This ensures that the model generalizes well and avoids overfitting.
+This validates how well the model is able to identify key features and generalize to new data.
 
 ---
 
@@ -69,7 +69,7 @@ Using the refined CatBoost model:
 1. Analyze **feature importance interactions** to identify how pairs of features interact with each other.
 2. Use this information to uncover deeper insights into relationships between features and their combined impact on predictions.
 
-CatBoost's built-in tools for interaction analysis are leveraged in this step.
+CatBoost's built-in tools for interaction analysis are leveraged to understand what drugs may be acting together.
 
 ---
 
@@ -85,15 +85,15 @@ Generate **Partial Dependency Interaction Plots** to visualize how interactions 
 ## Requirements
 
 To run this workflow, you will need:
-- **Apache Spark**: For distributed data processing.
-- **CatBoost**: For machine learning modeling.
+- **Apache Spark Cluster Environment**: For distributed data processing.
+- **Apache Spark CatBoost/Native CatBoost**: For machine learning modeling.
 - Python libraries:
   - `pyspark`
   - `catboost`
   - `pandas`
   - `numpy`
 
-Ensure that your environment is properly configured with these dependencies before proceeding.
+Recommend AWS EMR Studio with Jupyter Notebooks.
 
 ---
 
