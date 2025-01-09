@@ -23,6 +23,31 @@ execute:
   eval: false
 ---
 
+```{bash}
+
+aws ec2 describe-spot-price-history \
+    --instance-types 'm8g.48xlarge' \
+    --start-time 2024-01-01T00:00:00Z --end-time 2024-01-05T00:00:00Z \
+    --end-time 2024-01-05T00:00:00Z \
+    --query 'SpotPriceHistory[*].[InstanceType,SpotPrice,AvailabilityZone]' \
+    --region us-east-1 \
+    --profile pgx 
+
+```
+
+
+```{bash}
+
+aws ec2 describe-spot-price-history \
+    --instance-types m8g.48xlarge x8g.24xlarge x8g.16xlarge p5.48xlarge x8g.48xlarge i4g.16xlarge x2gd.16xlarge x8g.8xlarge r6g.16xlarge i3en.24xlarge g5.48xlarge x8g.12xlarge \
+    --start-time 2024-01-04T00:00:00Z \
+    --end-time 2024-01-05T00:00:00Z \
+    --query 'SpotPriceHistory[*].[InstanceType,SpotPrice,AvailabilityZone]' \
+    --profile pgx \
+    --output table
+```
+
+
 ### M7.12XLarge EMR Cluster (Sparklyr/PySpark bootstrap with Python3.7)
 
 - POSIT does not support AWS Linux 2023 so must use EMR 6.x with AWS Linux 2

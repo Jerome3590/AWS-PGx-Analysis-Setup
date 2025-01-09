@@ -1,3 +1,4 @@
+#m6.8xlarge
 %%configure -f
 {
     "conf": {
@@ -17,7 +18,27 @@
     }
 }
 
-
+# *.16xlarge (64 vCPUs)
+%%configure -f
+{
+    "conf": {
+        "spark.executor.memory": "64g",
+        "spark.executor.memoryOverhead": "8g",
+        "spark.executor.cores": "8",
+        "spark.executor.instances": "60",
+        "spark.driver.memory": "64g",
+        "spark.driver.memoryOverhead": "8g",
+        "spark.task.cpus": "1",
+        "spark.sql.shuffle.partitions": "1440",
+        "spark.executor.extraJavaOptions": "--add-exports java.base/sun.net.util=ALL-UNNAMED",
+        "spark.driver.extraJavaOptions": "--add-exports java.base/sun.net.util=ALL-UNNAMED",
+        "spark.network.timeout": "1200s",
+        "spark.rpc.askTimeout": "1200s",
+        "spark.shuffle.file.buffer": "1m",
+        "spark.reducer.maxSizeInFlight": "256m",
+        "spark.dynamicAllocation.enabled": "false"
+    }
+}
 
 
 
